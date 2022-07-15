@@ -1,6 +1,10 @@
-from flask import jsonify
+from msilib.schema import File
+import profile
 from model import User
+import os
 from flask import jsonify, make_response
+from datetime import datetime
+
 
 def post_user(data):
     '''
@@ -88,3 +92,33 @@ def delete_data(args):
 
     else:
         return make_response(jsonify({"message":"User doesn't exist"}), 402)
+
+
+
+def upload_profile_pic(data, args):
+    user = User.fetch_user_by_id(args["user_id"])
+    if user and user.active:
+        try:
+        # create a unique path for pic to store in file system
+            prof_pic_url = "/static/images/profiles/" + str(user.id) + str(datetime.now()) + ".png"
+            # get the current working directory
+            curr_dir = os.path.abspath(os.getcwd())
+            complete_pic_url = os.path.join(curr_dir, prof_pic_url)
+
+            pic = data["photo"]
+            pic.save(os.path.join(complete_pic_url))
+
+            photo_data = {"profile_pic_url" : complete_pic_url}
+            User.update_details(photo_data)
+
+            return make_response(jsonify({"message":"Profile photo updated successfully"}), 201)
+        
+        except Exception as e:
+            # print(e)
+            return make_response(jsonify({"message":f"Profile photo updated Failed with error {e}"}), 201)
+
+    else:
+        return make_response(jsonify({"message":"User is not in active state"}), 401)
+        
+
+

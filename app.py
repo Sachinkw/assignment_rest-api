@@ -1,7 +1,7 @@
-from flask import Flask, request
+from flask import Flask, redirect, request, jsonify
 from model import db
 from config import Config
-from controller import post_user, get_data, update_data, delete_data
+from controller import post_user, get_data, update_data, delete_data, upload_profile_pic
 
 app = Flask(__name__)
 
@@ -32,6 +32,17 @@ def get_user(email):
 def user_update():
     if request.method=="PATCH":
         return update_data(request.json)
+
+
+@app.route('/upload/pic', methods=["POST", "PUT"])
+def upload_pic():
+    if request.method in ["POST", "PUT"]:
+        if 'photo' in request.files:
+            # pass photo file and user_id in the argument
+            return upload_profile_pic(request.files, request.args)
+        # return redirect(request.url)
+        else:
+            return jsonify({"message":"No image"})
 
 
 @app.route('/delete/user', methods=["DELETE"])

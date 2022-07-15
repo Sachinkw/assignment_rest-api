@@ -1,3 +1,4 @@
+from enum import unique
 from flask_sqlalchemy import SQLAlchemy
 import json
 
@@ -7,7 +8,7 @@ db = SQLAlchemy()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
     mobile_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.Text)
     city = db.Column(db.String(100))
@@ -15,6 +16,7 @@ class User(db.Model):
     pincode = db.Column(db.String(10))
     country = db.Column(db.String(100))
     active = db.Column(db.Integer, default=1)
+    profile_pic_url = db.Column(db.Text)
 
     # To add an user instance to db and commit changes
     def save_user(self):
